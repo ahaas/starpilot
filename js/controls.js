@@ -25,6 +25,9 @@ CONTROLS.setMode = (mode, camera, renderer) => {
 
 const trackedKeyCodes = [];
 trackedKeyCodes[16] = 'shift';
+trackedKeyCodes[32] = 'space';
+trackedKeyCodes[81] = 'q';
+trackedKeyCodes[69] = 'e';
 trackedKeyCodes[87] = 'w';
 trackedKeyCodes[65] = 'a';
 trackedKeyCodes[83] = 's';

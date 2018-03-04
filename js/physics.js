@@ -2,16 +2,13 @@ PHYSICS = {}
 
 {
 
-
-const maxVelocity = 100;
-const maxAngularVelocity = 100;
-const velocityDecay = 5;
-const angularVelocityDecay = 20;
+const maxvel = 100;
+const maxAngularvel = 0.9;
+const velDecaySpeed = 5;
+const angVelDecaySpeed = 20;
 
 const halfPi = Math.PI / 2;
-const xAxis = new THREE.Vector3(0, 1, 0);
 const tmpVector3 = new THREE.Vector3(0, 0, 0);
-const tmpVector3_2 = new THREE.Vector3(0, 0, 0);
 
 PHYSICS.update = (delta) => {
   if (LEVEL.spaceCrafts.length == 0) {
@@ -19,68 +16,101 @@ PHYSICS.update = (delta) => {
   }
   updateLocalVelocities(delta);
   updatePositions(delta);
+  updateAngles(delta);
 };
 
+// TODO: Generalize this to accept input from AI as well.
 const updateLocalVelocities = (delta) => {
   const obj = LEVEL.localSpaceCraft;
-  decayVelocities(obj, delta);
 
-  const scalar = delta * 1e5 / obj.mass;
-  if (CONTROLS.keysPressed['w']) {
-    obj.getWorldDirection(tmpVector3);
-    // TODO: Clean up. Rotate x axis to get obj-local x axis, before
-    // rotating world direction to fix it.
-    tmpVector3_2.copy(xAxis).applyQuaternion(obj.quaternion);
-    tmpVector3.applyAxisAngle(tmpVector3_2, halfPi);
-    tmpVector3.normalize().multiplyScalar(scalar);
-    obj.velocity.add(tmpVector3);
+  let hasThrustInput = false;
+  obj.worldFront(tmpVector3);
+  const scalar = delta * 8 / obj.mass;
+  if (CONTROLS.keysPressed['shift']) {
+    hasThrustInput = true;
+    tmpVector3.normalize().multiplyScalar(scalar * obj.thrust);
+    obj.vel.add(tmpVector3);
+  }
+  if (CONTROLS.keysPressed['space']) {
+    hasThrustInput = true;
+    tmpVector3.normalize().multiplyScalar(scalar * obj.reverseThrust);
+    obj.vel.sub(tmpVector3);
+  }
+  if (!hasThrustInput) {
+    // TODO: remove?
+    decayVector3(obj.vel, delta, velDecaySpeed);
   }
 
-  obj.velocity.clampLength(0, maxVelocity);
-  obj.angularVelocity.clampLength(0, maxAngularVelocity);
+  applyAngInput(obj, SPACECRAFT.localFrontAxis, delta,
+                CONTROLS.keysPressed['d'],
+                CONTROLS.keysPressed['a']);
+  applyAngInput(obj, SPACECRAFT.localRightAxis, delta,
+                CONTROLS.keysPressed['s'],
+                CONTROLS.keysPressed['w']);
+  applyAngInput(obj, SPACECRAFT.localUpAxis, delta,
+                CONTROLS.keysPressed['q'],
+                CONTROLS.keysPressed['e']);
+  console.log(obj.angVel);
+
+  obj.vel.clampLength(0, maxvel);
+  obj.angVel.clampLength(0, maxAngularvel);  // should be `clamp`?
+}
+
+const applyAngInput = (obj, axis, delta, inputIncr, inputDecr) => {
+  const stableBoost = 2;
+  let angScalar = delta * obj.angularThrust * 1e-2 / obj.moment[axis];
+  if (inputDecr && !inputIncr) {
+    if (obj.angVel[axis] > 0) {
+      angScalar *= stableBoost;
+    }
+    obj.angVel[axis] -= angScalar;
+  } else if (inputIncr && !inputDecr) {
+    if (obj.angVel[axis] < 0) {
+      angScalar *= stableBoost;
+    }
+    obj.angVel[axis] += angScalar;
+  } else {
+    if (obj.angVel[axis] > 0) {
+      obj.angVel[axis] = Math.max(0, obj.angVel[axis] - angScalar);
+    } else if (obj.angVel[axis] < 0) {
+      obj.angVel[axis] = Math.min(0, obj.angVel[axis] + angScalar);
+    }
+  }
 }
 
 const updatePositions = (delta) => {
   LEVEL.spaceCrafts.forEach((obj) => {
-    // Don't modify velocity.
-    tmpVector3.copy(obj.velocity).multiplyScalar(delta);
+    // Don't modify vel.
+    tmpVector3.copy(obj.vel).multiplyScalar(delta);
     obj.position.add(tmpVector3);
-
-    if (obj == LEVEL.localSpaceCraft) {
-      //CONTROLS.addToCamera(tmpVector3);
-    }
   });
 }
 
-const decayVelocities = (obj, delta) => {
-  const velocityDecayAmount = velocityDecay * delta;
-  if (obj.velocity.length() < velocityDecayAmount) {
-    obj.velocity.x = 0;
-    obj.velocity.y = 0;
-    obj.velocity.z = 0;
-  } else {
-    tmpVector3.copy(obj.velocity);
-    tmpVector3.normalize().multiplyScalar(velocityDecayAmount);
-    obj.velocity.sub(tmpVector3);
-  }
+const updateAngles = (delta) => {
+  LEVEL.spaceCrafts.forEach((obj) => {
+    tmpVector3.copy(obj.angVel).multiplyScalar(delta);
+    obj.rotateX(tmpVector3.x);
+    obj.rotateY(tmpVector3.y);
+    obj.rotateZ(tmpVector3.z);
+  });
+}
 
-  const angularVelocityDecayAmount = angularVelocityDecay * delta;
-  if (obj.angularVelocity.length() < angularVelocityDecayAmount) {
-    obj.angularVelocity.x = 0;
-    obj.angularVelocity.y = 0;
-    obj.angularVelocity.z = 0;
+const decayVector3 = (vec3, delta, decaySpeed) => {
+  const amount = decaySpeed * delta;
+  if (vec3.length() < amount) {
+    vec3.x = vec3.y = vec3.z = 0;
   } else {
-    tmpVector3.copy(obj.angularVelocity);
-    tmpVector3.normalize().multiplyScalar(angularVelocityDecayAmount);
-    obj.angularVelocity.sub(tmpVector3);
+    tmpVector3.copy(vec3);
+    tmpVector3.normalize().multiplyScalar(amount);
+    vec3.sub(tmpVector3);
   }
 }
 
-PHYSICS.initializeObject = (obj, {mass, moment}) => {
-  obj.mass = mass;
-  obj.moment = moment;
-  obj.velocity = new THREE.Vector3(0, 0, 0);
-  obj.angularVelocity = new THREE.Vector3(0, 0, 0);
+PHYSICS.initializeObject = (obj, scSpec) => {
+  obj = Object.assign(obj, scSpec);
+
+  obj.vel = new THREE.Vector3(0, 0, 0);
+  obj.angVel = new THREE.Vector3(0, 0, 0);
 };
 
 

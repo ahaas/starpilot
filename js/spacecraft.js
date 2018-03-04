@@ -4,29 +4,48 @@ SPACECRAFT = {};
 
 // Load all spaceship models and create spawner funcs.
 SPACECRAFT.spawners = {};
+SPACECRAFT.localFront = new THREE.Vector3(0, 1, 0);
+SPACECRAFT.localFrontAxis = 'y';
+SPACECRAFT.localRight = new THREE.Vector3(1, 0, 0);
+SPACECRAFT.localRightAxis = 'x';
+SPACECRAFT.localUp = new THREE.Vector3(0, 0, 1);
+SPACECRAFT.localUpAxis = 'z';
 
+const halfPi = Math.PI / 2;
+
+// Moment is a Vector3 of (pitch, roll, yaw).
 const scSpecs = [
   {
     name: 'dstar',
     url: 'models/dstar_threejs/dstar.json',
-    rotX: 1.57,
     mass: 10000,
-    moment: 10000,
+    moment: new THREE.Vector3(5000, 1500, 3000),
+    thrust: 5000,
+    reverseThrust: 7000,
+    angularThrust: 10000,
   },
 ]
+
+const tmpQuaternion = new THREE.Quaternion();
 
 const loader = new THREE.JSONLoader();
 scSpecs.forEach((scSpec) => {
   loader.load(scSpec.url, function(geo, mats) {
     SPACECRAFT.spawners[scSpec.name] = () => {
       const obj = new THREE.Mesh(geo, mats[0]);
-      if (scSpec.rotX) {
-        obj.rotation.x = scSpec.rotX;
-      }
+      obj.rotation.x = halfPi;
+      obj.rotation.y = halfPi;
 
       // Wrapper obj is unrotated.
       const wrapperObj = new THREE.Object3D();
       wrapperObj.add(obj);
+
+      // +y is front of ship. +x is right. +z is upwards.
+      wrapperObj.worldFront = (vec3) => {
+        wrapperObj.getWorldQuaternion(tmpQuaternion);
+        return (vec3 || new THREE.Vector3()).copy(SPACECRAFT.localFront)
+            .applyQuaternion(tmpQuaternion);
+      }
       PHYSICS.initializeObject(wrapperObj, scSpec);
       return wrapperObj;
     };
