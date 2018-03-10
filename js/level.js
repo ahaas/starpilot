@@ -39,6 +39,7 @@ const createSpaceCraft = (scName, scene, team) => {
 const levelSetupFuncs = [
   // Level 1.
   (scene) => {
+    ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
   },
 ];

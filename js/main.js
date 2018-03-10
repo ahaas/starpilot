@@ -2,13 +2,17 @@ MAIN = {}
 
 {
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    logarithmicDepthBuffer: true,
+});
 const camera = new THREE.PerspectiveCamera(80, 1, 0.1, 20000);
 const scene = new THREE.Scene();
 
-camera.position.set(10, 10, 10);
+const skybox = SKYBOX.construct();
+
+camera.position.set(0, -50, 18);
 camera.up.set(0, 0, 1);  // Set +z as up.
-camera.position.z = 5
 
 renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1)
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -26,6 +30,7 @@ function render() {
   PHYSICS.update(delta);
   if (LEVEL.localSpaceCraft) {
     LEVEL.localSpaceCraft.add(camera);
+    camera.getWorldPosition(skybox.position);
   }
 
   renderer.render(scene, camera);
@@ -51,9 +56,16 @@ const directionalLight = new THREE.DirectionalLight(0xffeedd);
 directionalLight.position.set(0, 3, 1);
 scene.add(directionalLight);
 
+const dL = new THREE.DirectionalLight(0x555555);
+dL.position.set(3, 0, 1);
+scene.add(dL);
+
+const hemiLight = new THREE.HemisphereLight(0x555555, 0x111111, 0.5);
+scene.add(hemiLight);
+
 // Loading manager
 THREE.DefaultLoadingManager.onLoad = () => {
-  scene.add(SKYBOX.construct());
+  scene.add(skybox);
   CONTROLS.setMode(CONTROLS.modes.ORBIT, camera, renderer);
   LEVEL.loadLevelNum(0, scene);
 };

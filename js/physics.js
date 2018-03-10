@@ -50,7 +50,6 @@ const updateLocalVelocities = (delta) => {
   applyAngInput(obj, SPACECRAFT.localUpAxis, delta,
                 CONTROLS.keysPressed['q'],
                 CONTROLS.keysPressed['e']);
-  console.log(obj.angVel);
 
   obj.vel.clampLength(0, maxvel);
   obj.angVel.clampLength(0, maxAngularvel);  // should be `clamp`?
