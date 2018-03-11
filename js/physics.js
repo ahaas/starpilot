@@ -40,6 +40,7 @@ const updateLocalVelocities = (delta) => {
     // TODO: remove?
     decayVector3(obj.vel, delta, velDecaySpeed);
   }
+  LEVEL.localSpaceCraft.isThrusting = hasThrustInput;
 
   applyAngInput(obj, SPACECRAFT.localFrontAxis, delta,
                 CONTROLS.keysPressed['d'],
@@ -110,6 +111,7 @@ PHYSICS.initializeObject = (obj, scSpec) => {
 
   obj.vel = new THREE.Vector3(0, 0, 0);
   obj.angVel = new THREE.Vector3(0, 0, 0);
+  obj.isThrusting = false;
 };
 
 

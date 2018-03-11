@@ -18,11 +18,11 @@ camera.up.set(0, 0, 1);  // Set +z as up.
 renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1)
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(stats.dom);
+renderer.domElement.appendChild(stats.dom);
 
 //
 
-let prevTime = performance.now();  // Can be replaced with THREE.Clock
+let prevTime = performance.now();
 function render() {
   requestAnimationFrame(render);
 
@@ -33,20 +33,15 @@ function render() {
 
   PHYSICS.update(delta);
   SPACECRAFT_PARTICLES.animate(delta);
+  stats.update();
 
   // TODO: Move this out of render loop.
   if (LEVEL.localSpaceCraft) {
-    // TEMP
-    LEVEL.localSpaceCraft.actual.material.opacity = 0.4;
-    //LEVEL.localSpaceCraft.actual.material.transparent = true;
-    // END TEMP
-
     LEVEL.localSpaceCraft.add(camera);
     camera.getWorldPosition(skybox.position);
   }
 
   renderer.render(scene, camera);
-  stats.update();
 }
 render();
 
@@ -79,7 +74,7 @@ scene.add(hemiLight);
 
 // Loading manager
 THREE.DefaultLoadingManager.onLoad = () => {
-  //scene.add(skybox);
+  scene.add(skybox);
   CONTROLS.setMode(CONTROLS.modes.ORBIT, camera, renderer);
   SPACECRAFT_PARTICLES.initialize(scene);
   LEVEL.loadLevelNum(0, scene);

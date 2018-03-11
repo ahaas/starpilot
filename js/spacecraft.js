@@ -39,6 +39,7 @@ scSpecs.forEach((scSpec) => {
       // Wrapper obj is unrotated.
       const wrapperObj = new THREE.Object3D();
       wrapperObj.add(obj);
+      wrapperObj.actual = obj;
 
       // +y is front of ship. +x is right. +z is upwards.
       wrapperObj.worldFront = (vec3) => {
