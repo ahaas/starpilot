@@ -36,9 +36,10 @@ function render() {
   PHYSICS.update(delta);
   SPACECRAFT_TRAILS.update(scene, delta);
   SPACECRAFT_AI.update(delta, scene);
-  WEAPONS.update(delta, scene);
+  PROJECTILES.update();
 
   if (LEVEL.localSpaceCraft) {
+    WEAPONS.update(delta, scene);
     LEVEL.localSpaceCraft.add(camera);
     camera.getWorldPosition(skybox.position);
   }

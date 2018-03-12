@@ -2,7 +2,7 @@ WEAPONS = {}
 
 {
 
-const CANNON_DELAY = 0.5;
+const CANNON_DELAY = 0.25;
 const MISS_TRAVEL = 2000;  // distance of missed shots
 
 WEAPONS.update = (delta, scene) => {
@@ -22,10 +22,10 @@ WEAPONS.update = (delta, scene) => {
   });
 };
 
-const PHOTON_LENGTH = 40;
-const PHOTON_SPEED = 1000;
-const photonGeometry = new THREE.CylinderBufferGeometry(5, 5, PHOTON_LENGTH);
-const photonMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFF00 });
+const PHOTON_LENGTH = 200;
+const PHOTON_SPEED = 2000;
+const photonGeometry = new THREE.CylinderBufferGeometry(1, 1, PHOTON_LENGTH);
+const photonMaterial = new THREE.MeshBasicMaterial({ color: 0x88AAFF });
 
 const raycaster = new THREE.Raycaster();
 const v0 = new THREE.Vector3();
@@ -40,9 +40,9 @@ const fireCannon = (ship, scene) => {
     if (targetShip == ship) {
       return;
     }
-    const intersections = raycaster.intersectObject(targetShip.actual).length
+    const intersections = raycaster.intersectObject(targetShip.actual);
+    console.log(intersections);
     if (intersections.length > 0) {
-      end.copy(intersections[0].point);
       hitShip = targetShip;
     }
   });
@@ -54,13 +54,16 @@ const fireCannon = (ship, scene) => {
   // Draw a laser beam.
   const photon = new THREE.Mesh(photonGeometry, photonMaterial);
   photon.rotateX(Math.PI/2);
-  photon.applyMatrix4(ship.matrix);
+  photon.applyMatrix(ship.matrix);
 
   const dist = v0.copy(origin).distanceTo(end);
   PROJECTILES.add(photon, PHOTON_LENGTH, origin, end, dist/PHOTON_SPEED,
       () => {
-        hitShip.health -= 13.5;
-        console.log("HIT! Remaining health: ", hitShip.health);
+        if (hitShip) {
+          hitShip.health -= 13.5;
+          console.log("HIT! Remaining health: ", hitShip.health);
+        }
+        console.log("miss");
       }
   );
 };
