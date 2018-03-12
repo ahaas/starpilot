@@ -32,7 +32,7 @@ const keyToInputMap = {
   w: 'pitchDown',
   q: 'yawLeft',
   e: 'yawRight',
-}
+};
 
 const updateLocalInput = () => {
   const localShip = LEVEL.localSpaceCraft;
@@ -60,6 +60,7 @@ const updateShipVelocities = (ship, delta) => {
   if (!hasThrustInput) {
     decayVector3(ship.vel, delta, velDecaySpeed);
   }
+  decayCrossVel(ship, delta);
 
   applyAngInput(ship, SPACECRAFT.localFrontAxis, delta,
                 ship.inputs.rollRight, ship.inputs.rollLeft);
@@ -111,6 +112,7 @@ const updateAngles = (delta) => {
   });
 }
 
+// TODO: replace this with only decaying velocity in cross-directions?
 const decayVector3 = (vec3, delta, decaySpeed) => {
   const amount = decaySpeed * delta;
   if (vec3.length() < amount) {
@@ -120,7 +122,20 @@ const decayVector3 = (vec3, delta, decaySpeed) => {
     tmpVector3.normalize().multiplyScalar(amount);
     vec3.sub(tmpVector3);
   }
-}
+};
+
+// Decay the velocity components in non-forward direction.
+const v0 = new THREE.Vector3();
+const v1 = new THREE.Vector3();
+const decayCrossVel = (ship, delta) => {
+  // Forward vel.
+  v0.multiplyVectors(ship.vel, ship.worldFront());
+
+  // Cross vel.
+  v1.subVectors(ship.vel, v0);
+
+  ship.vel.sub(v1.multiplyScalar(0.2*delta));
+};
 
 PHYSICS.initializeObject = (obj, scSpec) => {
   obj = Object.assign(obj, scSpec);

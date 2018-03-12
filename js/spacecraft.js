@@ -25,6 +25,7 @@ const scSpecs = [
     angularThrust: 10000,
   },
 ]
+SPACECRAFT.specs = scSpecs;
 
 const tmpQuaternion = new THREE.Quaternion();
 
@@ -49,6 +50,7 @@ scSpecs.forEach((scSpec) => {
       }
 
       // Ship initalizers.
+      wrapperObj.shipName = scSpec.name;
       PHYSICS.initializeObject(wrapperObj, scSpec);
       WEAPONS.initializeShip(wrapperObj);
       return wrapperObj;

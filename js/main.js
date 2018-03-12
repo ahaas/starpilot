@@ -10,6 +10,8 @@ const camera = new THREE.PerspectiveCamera(80, 1, 0.1, 20000);
 const scene = new THREE.Scene();
 const stats = new Stats();
 
+MAIN = { scene };
+
 const skybox = SKYBOX.construct();
 
 camera.position.set(0, -50, 18);

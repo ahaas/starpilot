@@ -16,6 +16,10 @@ const states = {
 }
 
 const MIN_STATE_CHANGE_INTERVAL = 5;
+const v2 = new THREE.Vector3();
+const v3 = new THREE.Vector3();
+const v4 = new THREE.Vector3();
+const m1 = new THREE.Matrix4();
 const simulate = (sc) => {
   const now = performance.now() / 1000;
   const nearest = nearestEnemy();
@@ -41,30 +45,71 @@ const simulate = (sc) => {
     }
   }
 
+  const dir = v2.copy(posInLocalSpace(sc, nearest));
+  const onRight = dir.x > 0;
+  const onTop = dir.z > 0;
+  const lookingTowards = shipAngle(sc, nearest) < Math.PI * 0.10;  // 45 deg
+
+  // Get pitch angle to target. Positive means above.
+  v3.copy(dir);
+  v3.x = 0;
+  const pitchAng = SPACECRAFT.localFront.angleTo(v3) * (onTop ? 1 : -1);
+
+  // Get roll angle from, from -90 to 90 degrees. Positive means on right.
+  v3.copy(dir);
+  v3.y = 0;
+  const rollAng = SPACECRAFT.localUp.angleTo(v3) * (onRight ? 1 : -1);
+
+  sc.worldFront(v4);
+  const forwardSpeed = v4.dot(sc.vel);
+
+  //sc.ai.state = states.attack; // DEBUG
+
   // Act based on state.
+  sc.inputs = {};
   if (sc.ai.state == states.attack) {
-    sc.inputs = {};
-    sc.inputs.thrust = isShipLookingTowards(sc, nearest);
+    //console.log(dir.y, forwardSpeed);
+    sc.inputs.thrust = lookingTowards && dir.y - forwardSpeed * 5 > 0;
     sc.inputs.thrustReverse = !sc.inputs.thrust;
+
+    sc.inputs.rollRight = rollAng - sc.angVel.y * 2.2 > 0;
+    sc.inputs.rollLeft = !sc.inputs.rollRight;
+
+    // TODO: Only pitch up/down if roll ang is not too great. Otherwise pitch
+    // is misdirected.
+    sc.inputs.pitchUp = pitchAng - sc.angVel.x * 2.2 > 0;
+    sc.inputs.pitchDown = !sc.inputs.pitchUp;
+    //console.log(pitchAng, sc.angVel.x, sc.inputs.pitchUp);
   } else if (sc.ai.state == states.flee) {
     sc.inputs.thrust = true;
   }
+
+
+  // TODO: set inputs.fire
 }
 
 const nearestEnemy = (sc) => {
   return LEVEL.localSpaceCraft;
 };
 
-const t0 = new THREE.Vector3();
-const t1 = new THREE.Vector3();
-const isShipLookingTowards = (ship, target) => {
-  t0.copy(target.position).sub(ship.position);
-  ship.worldFront(t1);
-  const angle = t0.angleTo(t1);  // Angle between 0 and pi.
+const v0 = new THREE.Vector3();
+const v1 = new THREE.Vector3();
+const m0 = new THREE.Matrix4();
+
+const shipAngle = (ship, target) => {
+  v0.copy(target.position).sub(ship.position);
+  ship.worldFront(v1);
+  const angle = v0.angleTo(v1);  // Angle between 0 and pi.
+  return angle;
   return angle < Math.PI / 2;
 };
 
-
+const posInLocalSpace = (ship, target) => {
+  m0.getInverse(ship.matrix);
+  v0.copy(target.position);
+  v0.applyMatrix4(m0);
+  return v0;
+}
 
 
 }
