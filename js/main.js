@@ -32,15 +32,11 @@ function render() {
   prevTime = time;
 
   PHYSICS.update(delta);
-  SPACECRAFT_PARTICLES.animate(delta);
+  SPACECRAFT_TRAILS.update(scene, delta);
+  SPACECRAFT_AI.update(delta, scene);
+  WEAPONS.update(delta, scene);
 
-  // TODO: Move this out of render loop.
   if (LEVEL.localSpaceCraft) {
-    // TEMP
-    LEVEL.localSpaceCraft.actual.material.opacity = 0.4;
-    //LEVEL.localSpaceCraft.actual.material.transparent = true;
-    // END TEMP
-
     LEVEL.localSpaceCraft.add(camera);
     camera.getWorldPosition(skybox.position);
   }
@@ -79,9 +75,8 @@ scene.add(hemiLight);
 
 // Loading manager
 THREE.DefaultLoadingManager.onLoad = () => {
-  //scene.add(skybox);
+  scene.add(skybox);
   CONTROLS.setMode(CONTROLS.modes.ORBIT, camera, renderer);
-  SPACECRAFT_PARTICLES.initialize(scene);
   LEVEL.loadLevelNum(0, scene);
 };
 

@@ -32,6 +32,7 @@ trackedKeyCodes[87] = 'w';
 trackedKeyCodes[65] = 'a';
 trackedKeyCodes[83] = 's';
 trackedKeyCodes[68] = 'd';
+trackedKeyCodes[67] = 'c';
 
 document.addEventListener('keydown', (event) => {
   const keyName = trackedKeyCodes[event.keyCode];

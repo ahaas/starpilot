@@ -14,47 +14,63 @@ PHYSICS.update = (delta) => {
   if (LEVEL.spaceCrafts.length == 0) {
     return;
   }
-  updateLocalVelocities(delta);
+  //updateLocalVelocities(delta);
+  updateLocalInput();
+  LEVEL.spaceCrafts.forEach((ship) => {
+    updateShipVelocities(ship, delta);
+  });
   updatePositions(delta);
   updateAngles(delta);
 };
 
-// TODO: Generalize this to accept input from AI as well.
-const updateLocalVelocities = (delta) => {
-  const obj = LEVEL.localSpaceCraft;
+const keyToInputMap = {
+  shift: 'thrust',
+  space: 'thrustReverse',
+  d: 'rollRight',
+  a: 'rollLeft',
+  s: 'pitchUp',
+  w: 'pitchDown',
+  q: 'yawLeft',
+  e: 'yawRight',
+}
 
-  let hasThrustInput = false;
-  obj.worldFront(tmpVector3);
-  const scalar = delta * 8 / obj.mass;
-  if (CONTROLS.keysPressed['shift']) {
-    hasThrustInput = true;
-    tmpVector3.normalize().multiplyScalar(scalar * obj.thrust);
-    obj.vel.add(tmpVector3);
+const updateLocalInput = () => {
+  const localShip = LEVEL.localSpaceCraft;
+  localShip.inputs = localShip.inputs || {};
+  for (let key in keyToInputMap) {
+    localShip.inputs[keyToInputMap[key]] = CONTROLS.keysPressed[key];
   }
-  if (CONTROLS.keysPressed['space']) {
+};
+
+// Update velocities based on ship.inputs
+const updateShipVelocities = (ship, delta) => {
+  let hasThrustInput = false;
+  ship.worldFront(tmpVector3);
+  const scalar = delta * 8 / ship.mass;
+  if (ship.inputs.thrust) {
     hasThrustInput = true;
-    tmpVector3.normalize().multiplyScalar(scalar * obj.reverseThrust);
-    obj.vel.sub(tmpVector3);
+    tmpVector3.normalize().multiplyScalar(scalar * ship.thrust);
+    ship.vel.add(tmpVector3);
+  }
+  if (ship.inputs.thrustReverse) {
+    hasThrustInput = true;
+    tmpVector3.normalize().multiplyScalar(scalar * ship.reverseThrust);
+    ship.vel.sub(tmpVector3);
   }
   if (!hasThrustInput) {
-    // TODO: remove?
-    decayVector3(obj.vel, delta, velDecaySpeed);
+    decayVector3(ship.vel, delta, velDecaySpeed);
   }
-  LEVEL.localSpaceCraft.isThrusting = hasThrustInput;
 
-  applyAngInput(obj, SPACECRAFT.localFrontAxis, delta,
-                CONTROLS.keysPressed['d'],
-                CONTROLS.keysPressed['a']);
-  applyAngInput(obj, SPACECRAFT.localRightAxis, delta,
-                CONTROLS.keysPressed['s'],
-                CONTROLS.keysPressed['w']);
-  applyAngInput(obj, SPACECRAFT.localUpAxis, delta,
-                CONTROLS.keysPressed['q'],
-                CONTROLS.keysPressed['e']);
+  applyAngInput(ship, SPACECRAFT.localFrontAxis, delta,
+                ship.inputs.rollRight, ship.inputs.rollLeft);
+  applyAngInput(ship, SPACECRAFT.localRightAxis, delta,
+                ship.inputs.pitchUp, ship.inputs.pitchDown);
+  applyAngInput(ship, SPACECRAFT.localUpAxis, delta,
+                ship.inputs.yawLeft, ship.inputs.yawRight);
 
-  obj.vel.clampLength(0, maxvel);
-  obj.angVel.clampLength(0, maxAngularvel);  // should be `clamp`?
-}
+  ship.vel.clampLength(0, maxvel);
+  ship.angVel.clampLength(0, maxAngularvel);  // should be `clamp`?
+};
 
 const applyAngInput = (obj, axis, delta, inputIncr, inputDecr) => {
   const stableBoost = 2;
@@ -112,6 +128,7 @@ PHYSICS.initializeObject = (obj, scSpec) => {
   obj.vel = new THREE.Vector3(0, 0, 0);
   obj.angVel = new THREE.Vector3(0, 0, 0);
   obj.isThrusting = false;
+  obj.inputs = {};
 };
 
 

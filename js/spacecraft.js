@@ -47,7 +47,10 @@ scSpecs.forEach((scSpec) => {
         return (vec3 || new THREE.Vector3()).copy(SPACECRAFT.localFront)
             .applyQuaternion(tmpQuaternion);
       }
+
+      // Ship initalizers.
       PHYSICS.initializeObject(wrapperObj, scSpec);
+      WEAPONS.initializeShip(wrapperObj);
       return wrapperObj;
     };
   });

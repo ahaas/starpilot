@@ -1,4 +1,4 @@
-LEVEL = {}
+LEVEL = {};
 
 {
 
@@ -32,8 +32,8 @@ const createSpaceCraft = (scName, scene, team) => {
   newSc = SPACECRAFT.spawners[scName]();
   newSc.team = team || LEVEL.teams.enemy;
 
-  LEVEL.spaceCrafts.push(LEVEL.localSpaceCraft);
-  scene.add(localSpaceCraft);
+  LEVEL.spaceCrafts.push(newSc);
+  scene.add(newSc);
 }
 
 const levelSetupFuncs = [
@@ -41,6 +41,8 @@ const levelSetupFuncs = [
   (scene) => {
     ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
+
+    createSpaceCraft('dstar', scene);
   },
 ];
 

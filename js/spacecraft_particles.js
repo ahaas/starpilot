@@ -1,3 +1,5 @@
+// UNUSED
+
 SPACECRAFT_PARTICLES = {}
 
 {
