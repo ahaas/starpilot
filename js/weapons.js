@@ -41,7 +41,6 @@ const fireCannon = (ship, scene) => {
       return;
     }
     const intersections = raycaster.intersectObject(targetShip.actual);
-    console.log(intersections);
     if (intersections.length > 0) {
       hitShip = targetShip;
     }
@@ -49,6 +48,8 @@ const fireCannon = (ship, scene) => {
 
   if (hitShip == null) {
     ship.worldFront(end).multiplyScalar(MISS_TRAVEL).add(ship.position);
+  } else {
+    end.copy(hitShip.position);
   }
 
   // Draw a laser beam.
@@ -63,7 +64,6 @@ const fireCannon = (ship, scene) => {
           hitShip.health -= 13.5;
           console.log("HIT! Remaining health: ", hitShip.health);
         }
-        console.log("miss");
       }
   );
 };

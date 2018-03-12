@@ -31,9 +31,12 @@ const createLocalSpaceCraft = (scName, scene) => {
 const createSpaceCraft = (scName, scene, team) => {
   newSc = SPACECRAFT.spawners[scName]();
   newSc.team = team || LEVEL.teams.enemy;
+  newSc.trailColor = 0xFF6666;
 
   LEVEL.spaceCrafts.push(newSc);
   scene.add(newSc);
+
+  return newSc;
 }
 
 const levelSetupFuncs = [
@@ -42,7 +45,14 @@ const levelSetupFuncs = [
     ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
 
-    createSpaceCraft('dstar', scene);
+    let enemy
+    enemy = createSpaceCraft('dstar', scene);
+    enemy.position.y = 100;
+    enemy.position.x = 50;
+
+    enemy = createSpaceCraft('dstar', scene);
+    enemy.position.y = 100;
+    enemy.position.x = -50;
   },
 ];
 

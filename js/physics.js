@@ -74,7 +74,7 @@ const updateShipVelocities = (ship, delta) => {
 };
 
 const applyAngInput = (obj, axis, delta, inputIncr, inputDecr) => {
-  const stableBoost = 2;
+  const stableBoost = 4;
   let angScalar = delta * obj.angularThrust * 1e-2 / obj.moment[axis];
   if (inputDecr && !inputIncr) {
     if (obj.angVel[axis] > 0) {
@@ -88,9 +88,9 @@ const applyAngInput = (obj, axis, delta, inputIncr, inputDecr) => {
     obj.angVel[axis] += angScalar;
   } else {
     if (obj.angVel[axis] > 0) {
-      obj.angVel[axis] = Math.max(0, obj.angVel[axis] - angScalar);
+      obj.angVel[axis] = Math.max(0, obj.angVel[axis] - angScalar * 2);
     } else if (obj.angVel[axis] < 0) {
-      obj.angVel[axis] = Math.min(0, obj.angVel[axis] + angScalar);
+      obj.angVel[axis] = Math.min(0, obj.angVel[axis] + angScalar * 2);
     }
   }
 }
@@ -129,12 +129,18 @@ const v0 = new THREE.Vector3();
 const v1 = new THREE.Vector3();
 const decayCrossVel = (ship, delta) => {
   // Forward vel.
-  v0.multiplyVectors(ship.vel, ship.worldFront());
+  ship.worldFront(v0);
+  const forwardSpeed = ship.vel.dot(v0);
+  forwardVel = v0.multiplyScalar(forwardSpeed);
 
   // Cross vel.
-  v1.subVectors(ship.vel, v0);
-
-  ship.vel.sub(v1.multiplyScalar(0.2*delta));
+  const crossVel = v1.subVectors(ship.vel, v0);
+  const crossVelDecrease = delta * 100;
+  if (crossVel.length() < crossVelDecrease) {
+    ship.vel.sub(crossVel);
+  } else {
+    ship.vel.sub(crossVel.normalize().multiplyScalar(crossVelDecrease));
+  }
 };
 
 PHYSICS.initializeObject = (obj, scSpec) => {

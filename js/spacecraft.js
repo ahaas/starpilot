@@ -20,9 +20,9 @@ const scSpecs = [
     url: 'models/dstar_threejs/dstar.json',
     mass: 10000,
     moment: new THREE.Vector3(5000, 1500, 3000),
-    thrust: 5000,
-    reverseThrust: 7000,
-    angularThrust: 10000,
+    thrust: 5000 * 3,
+    reverseThrust: 5000 * 2,
+    angularThrust: 10000 * 4,
   },
 ]
 SPACECRAFT.specs = scSpecs;
@@ -33,6 +33,7 @@ const loader = new THREE.JSONLoader();
 scSpecs.forEach((scSpec) => {
   loader.load(scSpec.url, function(geo, mats) {
     SPACECRAFT.spawners[scSpec.name] = () => {
+      mats[0].emissive.set(0x111111);
       const obj = new THREE.Mesh(geo, mats[0]);
       obj.rotation.x = halfPi;
       obj.rotation.y = halfPi;

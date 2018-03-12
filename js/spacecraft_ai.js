@@ -67,17 +67,18 @@ const simulate = (sc) => {
 
   // Act based on state.
   sc.inputs = {};
+  const STEER_AGGRO = 1;
   if (sc.ai.state == states.attack) {
     //console.log(dir.y, forwardSpeed);
     sc.inputs.thrust = lookingTowards && dir.y - forwardSpeed * 5 > 0;
     sc.inputs.thrustReverse = !sc.inputs.thrust;
 
-    sc.inputs.rollRight = rollAng - sc.angVel.y * 2.2 > 0;
+    sc.inputs.rollRight = rollAng - sc.angVel.y * STEER_AGGRO > 0;
     sc.inputs.rollLeft = !sc.inputs.rollRight;
 
     // TODO: Only pitch up/down if roll ang is not too great. Otherwise pitch
     // is misdirected.
-    sc.inputs.pitchUp = pitchAng - sc.angVel.x * 2.2 > 0;
+    sc.inputs.pitchUp = pitchAng - sc.angVel.x * STEER_AGGRO > 0;
     sc.inputs.pitchDown = !sc.inputs.pitchUp;
     //console.log(pitchAng, sc.angVel.x, sc.inputs.pitchUp);
   } else if (sc.ai.state == states.flee) {
