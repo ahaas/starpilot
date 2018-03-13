@@ -6,9 +6,11 @@ const renderer = new THREE.WebGLRenderer({
     antialias: true,
     logarithmicDepthBuffer: true,
 });
-const camera = new THREE.PerspectiveCamera(80, 1, 0.1, 20000);
+const camera = new THREE.PerspectiveCamera(80, 1, 0.1, 1000 * 1000 * 2);
 const scene = new THREE.Scene();
 const stats = new Stats();
+MAIN.listener = new THREE.AudioListener();
+camera.add(MAIN.listener);
 
 MAIN = { scene };
 
@@ -41,6 +43,7 @@ function render() {
   if (LEVEL.localSpaceCraft) {
     WEAPONS.update(delta, scene);
     LEVEL.localSpaceCraft.add(camera);
+    VFX.update();
     camera.getWorldPosition(skybox.position);
   }
 

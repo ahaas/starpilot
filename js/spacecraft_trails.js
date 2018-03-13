@@ -41,7 +41,7 @@ SPACECRAFT_TRAILS.update = (scene, delta) => {
 
     const material = new THREE.LineBasicMaterial({
       color: LEVEL.teamConfigs[sc.team].trailColor || 0xFFFFFF,
-      linewidth: 1000,
+      linewidth: 5,
     });
     const geometry = new THREE.Geometry();
     for (let i = 0; i < TRAIL_LENGTH; i++) {

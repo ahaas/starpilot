@@ -33,6 +33,12 @@ const keyToInputMap = {
   q: 'yawLeft',
   e: 'yawRight',
 };
+// construct reverse map
+PHYSICS.inputMap = {};
+for (const key in keyToInputMap) {
+  const input = keyToInputMap[key];
+  PHYSICS.inputMap[input] = key;
+}
 
 const updateLocalInput = () => {
   const localShip = LEVEL.localSpaceCraft;

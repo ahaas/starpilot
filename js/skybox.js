@@ -6,7 +6,8 @@ const loader = new THREE.TextureLoader();
 const imagePrefix = "img/skybox_";
 const directions  = ["LF", "RT", "FR", "BK", "UP", "DN"];
 const imageSuffix = ".jpg";
-const skyGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
+const s = 1000 * 1000;
+const skyGeometry = new THREE.CubeGeometry(s, s, s);
 
 const materialArray = [];
 for (let i = 0; i < 6; i++) {

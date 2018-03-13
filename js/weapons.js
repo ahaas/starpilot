@@ -45,12 +45,14 @@ const fireCannon = (ship, scene) => {
   raycaster.set(ship.position, ship.worldFront());
 
   let hitShip = null;
+  let intersection = null;
   LEVEL.spaceCrafts.forEach((targetShip) => {
     if (targetShip == ship) {
       return;
     }
     const intersections = raycaster.intersectObject(targetShip.actual);
     if (intersections.length > 0) {
+      intersection = intersections[0];
       hitShip = targetShip;
     }
   });
@@ -58,7 +60,7 @@ const fireCannon = (ship, scene) => {
   if (hitShip == null) {
     ship.worldFront(end).multiplyScalar(MISS_TRAVEL).add(ship.position);
   } else {
-    end.copy(hitShip.position);
+    end.copy(intersection.point);
   }
 
   // Draw a laser beam.
@@ -71,7 +73,14 @@ const fireCannon = (ship, scene) => {
   PROJECTILES.add(photon, PHOTON_LENGTH, origin, end, dist/PHOTON_SPEED,
       () => {
         if (hitShip) {
-          hitShip.health -= 13.5;
+          hitShip.health -= 13.5/2;
+          if (hitShip.health <= 0) {
+            VFX.explode(hitShip.position, 50, 4, 0xFFFFFF, 0xFFFFFF);
+            LEVEL.removeShip(hitShip);
+            MAIN.scene.remove(hitShip);
+          } else {
+            VFX.explode(hitShip.position, 15, 0.25, 0xAAAAFF, 0xFFFFFF);
+          }
           console.log("HIT! Remaining health: ", hitShip.health);
         }
       }

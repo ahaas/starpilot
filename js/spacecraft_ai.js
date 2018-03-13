@@ -13,6 +13,7 @@ SPACECRAFT_AI.update = (delta, scene) => {
 const states = {
   attack: 2,  // Attack nearest enemy by aiming and keeping in range.
   flee: 3,  // Move away from nearest enemy.
+  wait: 4,  // no inputs
 }
 
 const MIN_STATE_CHANGE_INTERVAL = 5;
@@ -22,11 +23,16 @@ const v4 = new THREE.Vector3();
 const m1 = new THREE.Matrix4();
 const simulate = (sc) => {
   const now = performance.now() / 1000;
-  const nearest = nearestEnemy();
+  const nearest = nearestEnemy(sc);
+  if (!nearest) {
+    sc.ai.state = states.wait;
+    resetInputs(sc);
+    return;
+  }
 
   if (sc.ai == undefined) {
     sc.ai = {
-      state: states.flee,
+      state: states.attack,
       lastStateChange: now,
     }
   }
@@ -66,7 +72,7 @@ const simulate = (sc) => {
   //sc.ai.state = states.attack; // DEBUG
 
   // Act based on state.
-  sc.inputs = {};
+  resetInputs(sc);
 
   const STEER_AGGRO = 1.5;
   if (sc.ai.state == states.attack) {
@@ -90,8 +96,21 @@ const simulate = (sc) => {
   sc.inputs.fire = shipAngle(sc, nearest) < Math.PI * 0.03;
 }
 
-const nearestEnemy = (sc) => {
-  return LEVEL.localSpaceCraft;
+const nearestEnemy = (ship) => {
+  let closestDist = 1e10;
+  let closestShip = null;
+  LEVEL.spaceCrafts.forEach((otherShip) => {
+    if (otherShip.team == ship.team) {
+      return;
+    }
+    const dist = otherShip.position.distanceTo(ship.position);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestShip = otherShip;
+    }
+  });
+
+  return closestShip;
 };
 
 const v0 = new THREE.Vector3();
@@ -111,6 +130,12 @@ const posInLocalSpace = (ship, target) => {
   v0.copy(target.position);
   v0.applyMatrix4(m0);
   return v0;
+}
+
+const resetInputs = (ship) => {
+  for (const input in PHYSICS.inputMap) {
+    ship.inputs[input] = false;
+  }
 }
 
 

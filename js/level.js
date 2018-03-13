@@ -31,6 +31,13 @@ LEVEL.loadLevelNum = (num, scene) => {
   levelSetupFuncs[num](scene);
 }
 
+LEVEL.removeShip = (ship) => {
+  const i = LEVEL.spaceCrafts.indexOf(ship);
+  if (i > -1) { LEVEL.spaceCrafts.splice(i, 1); }
+  MAIN.scene.remove(ship.line);
+  MAIN.scene.remove(ship);
+}
+
 const createLocalSpaceCraft = (scName, scene) => {
   LEVEL.localSpaceCraft = SPACECRAFT.spawners[scName]();
   LEVEL.localSpaceCraft.team = LEVEL.teams.local;
@@ -57,12 +64,33 @@ const levelSetupFuncs = [
 
     let enemy
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
-    enemy.position.y = 100;
+    enemy.position.y = 200;
     enemy.position.x = 50;
+    enemy.rotateZ(Math.PI);
 
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
     enemy.position.y = 100;
     enemy.position.x = -50;
+
+    /// test
+    enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
+    enemy.position.y = 500;
+    enemy.position.x = -50;
+
+    enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
+    enemy.position.y = -500;
+    enemy.position.x = 0;
+    enemy.position.z = 100;
+
+    enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
+    enemy.position.y = -500;
+    enemy.position.x = -400;
+    enemy.position.z = 150;
+
+    enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
+    enemy.position.y = -500;
+    enemy.position.x = 400;
+    enemy.position.z = -150;
   },
 ];
 
