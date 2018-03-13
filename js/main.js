@@ -12,7 +12,7 @@ const stats = new Stats();
 MAIN.listener = new THREE.AudioListener();
 camera.add(MAIN.listener);
 
-MAIN = { scene };
+MAIN.scene = scene;
 
 const skybox = SKYBOX.construct();
 
@@ -87,7 +87,7 @@ THREE.DefaultLoadingManager.onLoad = () => {
 };
 
 THREE.DefaultLoadingManager.onProgress = (url, numLoaded, numTotal) => {
-  //console.log('Loading: ' + url + '\nLoaded ' + numLoaded + '/' + numTotal);
+  console.log('Loading: ' + url + '\nLoaded ' + numLoaded + '/' + numTotal);
 };
 
 

@@ -44,10 +44,8 @@ const simulate = (sc) => {
     const dist = sc.position.distanceTo(nearest.position);
     if (dist > 100) {
       sc.ai.state = states.attack;
-      console.log('attacking');
     } else {
       sc.ai.state = states.flee;
-      console.log('fleeing');
     }
   }
 

@@ -17,6 +17,7 @@ WEAPONS.update = (delta, scene) => {
       fireCannon(ship, scene);
     }
     if (ship.inputs.fire && ship.nextFire == 0) {
+      SOUNDFX.fireShip(ship);
       ship.nextFire = now + CANNON_DELAY;
     }
   });
@@ -39,6 +40,7 @@ for (let teamName in LEVEL.teams) {
 const raycaster = new THREE.Raycaster();
 const v0 = new THREE.Vector3();
 const fireCannon = (ship, scene) => {
+
   // Do a forward trace.
   const origin = new THREE.Vector3().copy(ship.position);
   const end = new THREE.Vector3();

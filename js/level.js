@@ -29,6 +29,10 @@ LEVEL.clear = (scene) => {
 LEVEL.loadLevelNum = (num, scene) => {
   LEVEL.clear(scene);
   levelSetupFuncs[num](scene);
+  // TODO: FIX THIS
+  window.setTimeout(() => {
+    SOUNDFX.initLevel();
+  }, 3000);
 }
 
 LEVEL.removeShip = (ship) => {
