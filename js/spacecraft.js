@@ -19,6 +19,7 @@ const scSpecs = [
     name: 'dstar',
     url: 'models/dstar_threejs/dstar.json',
     mass: 10000,
+    radius: 8,
     moment: new THREE.Vector3(5000, 1500, 3000),
     thrust: 5000 * 3,
     reverseThrust: 5000 * 2,

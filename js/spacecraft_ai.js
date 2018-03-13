@@ -67,7 +67,8 @@ const simulate = (sc) => {
 
   // Act based on state.
   sc.inputs = {};
-  const STEER_AGGRO = 1;
+
+  const STEER_AGGRO = 1.5;
   if (sc.ai.state == states.attack) {
     //console.log(dir.y, forwardSpeed);
     sc.inputs.thrust = lookingTowards && dir.y - forwardSpeed * 5 > 0;
@@ -85,8 +86,8 @@ const simulate = (sc) => {
     sc.inputs.thrust = true;
   }
 
-
-  // TODO: set inputs.fire
+  // Fire if target is within cone.
+  sc.inputs.fire = shipAngle(sc, nearest) < Math.PI * 0.03;
 }
 
 const nearestEnemy = (sc) => {

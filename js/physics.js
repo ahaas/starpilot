@@ -43,6 +43,7 @@ const updateLocalInput = () => {
 };
 
 // Update velocities based on ship.inputs
+const v4 = new THREE.Vector3();
 const updateShipVelocities = (ship, delta) => {
   let hasThrustInput = false;
   ship.worldFront(tmpVector3);
@@ -71,6 +72,22 @@ const updateShipVelocities = (ship, delta) => {
 
   ship.vel.clampLength(0, maxvel);
   ship.angVel.clampLength(0, maxAngularvel);  // should be `clamp`?
+
+  // Update for collisions.
+  LEVEL.spaceCrafts.forEach((otherShip) => {
+    // TODO: compute based on ship size?
+    if (ship.position.distanceTo(otherShip.position) < ship.radius*2) {
+      v4.subVectors(ship.position, otherShip.position).normalize();
+      ship.vel.add(v4.multiplyScalar(10));
+    }
+  });
+  LEVEL.staticObjs.forEach((staticObj) => {
+    if (ship.position.distanceTo(staticObj.position)
+        < staticObj.staticObjRadius + ship.radius) {
+      v4.subVectors(ship.position, staticObj.position).normalize();
+      ship.vel.add(v4.multiplyScalar(30));
+    }
+  });
 };
 
 const applyAngInput = (obj, axis, delta, inputIncr, inputDecr) => {
@@ -127,6 +144,7 @@ const decayVector3 = (vec3, delta, decaySpeed) => {
 // Decay the velocity components in non-forward direction.
 const v0 = new THREE.Vector3();
 const v1 = new THREE.Vector3();
+const CROSS_VEL_DECR_RATE = 50;
 const decayCrossVel = (ship, delta) => {
   // Forward vel.
   ship.worldFront(v0);
@@ -135,7 +153,7 @@ const decayCrossVel = (ship, delta) => {
 
   // Cross vel.
   const crossVel = v1.subVectors(ship.vel, v0);
-  const crossVelDecrease = delta * 100;
+  const crossVelDecrease = delta * CROSS_VEL_DECR_RATE;
   if (crossVel.length() < crossVelDecrease) {
     ship.vel.sub(crossVel);
   } else {

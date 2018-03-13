@@ -40,7 +40,7 @@ SPACECRAFT_TRAILS.update = (scene, delta) => {
     pos.multiplyScalar(-20).add(sc.position);
 
     const material = new THREE.LineBasicMaterial({
-      color: sc.trailColor || 0xAAAAFF,
+      color: LEVEL.teamConfigs[sc.team].trailColor || 0xFFFFFF,
       linewidth: 1000,
     });
     const geometry = new THREE.Geometry();

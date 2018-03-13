@@ -25,7 +25,16 @@ WEAPONS.update = (delta, scene) => {
 const PHOTON_LENGTH = 200;
 const PHOTON_SPEED = 2000;
 const photonGeometry = new THREE.CylinderBufferGeometry(1, 1, PHOTON_LENGTH);
-const photonMaterial = new THREE.MeshBasicMaterial({ color: 0x88AAFF });
+
+const teamPhotonMats = [];
+for (let teamName in LEVEL.teams) {
+  const teamIndex = LEVEL.teams[teamName];
+  const teamConfig = LEVEL.teamConfigs[teamIndex];
+  console.log(teamName, teamIndex, teamConfig);
+  teamPhotonMats[teamIndex] = new THREE.MeshBasicMaterial({
+    color: teamConfig.photonColor,
+  });
+};
 
 const raycaster = new THREE.Raycaster();
 const v0 = new THREE.Vector3();
@@ -53,6 +62,7 @@ const fireCannon = (ship, scene) => {
   }
 
   // Draw a laser beam.
+  const photonMaterial = teamPhotonMats[ship.team];
   const photon = new THREE.Mesh(photonGeometry, photonMaterial);
   photon.rotateX(Math.PI/2);
   photon.applyMatrix(ship.matrix);
