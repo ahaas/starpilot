@@ -65,8 +65,10 @@ const levelSetupFuncs = [
   (scene) => {
     LEVEL.staticObjs = ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
+    LEVEL.localSpaceCraft.position.y = -1000;
 
-    let enemy
+    let enemy;
+    /*let enemy
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
     enemy.position.y = 200;
     enemy.position.x = 50;
@@ -94,7 +96,24 @@ const levelSetupFuncs = [
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
     enemy.position.y = -500;
     enemy.position.x = 400;
-    enemy.position.z = -150;
+    enemy.position.z = -150;*/
+
+    const interval = 100;
+    for (let i = -4; i <= 4; i++) {
+      if (i == 0) continue;
+      enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
+      enemy.position.y = -1000;
+      enemy.position.x = i * interval + 50;
+      enemy.rotateZ(Math.PI * -.3);
+    }
+    for (let i = -5; i <= 5; i++) {
+      enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
+      enemy.position.y = 1000;
+      enemy.position.z = i * interval;
+      enemy.rotateZ(Math.PI * 1.3);
+    }
+    /**/
+
   },
 ];
 

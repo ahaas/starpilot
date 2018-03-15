@@ -9,7 +9,7 @@ WEAPONS.update = (delta, scene) => {
   const localSC = LEVEL.localSpaceCraft;
   const now = performance.now() / 1000;
 
-  localSC.inputs.fire = CONTROLS.keysPressed['c'];
+  //localSC.inputs.fire = CONTROLS.keysPressed['c'];
 
   LEVEL.spaceCrafts.forEach((ship) => {
     if (ship.nextFire != 0 && now > ship.nextFire) {
@@ -17,7 +17,6 @@ WEAPONS.update = (delta, scene) => {
       fireCannon(ship, scene);
     }
     if (ship.inputs.fire && ship.nextFire == 0) {
-      SOUNDFX.fireShip(ship);
       ship.nextFire = now + CANNON_DELAY;
     }
   });
@@ -40,6 +39,7 @@ for (let teamName in LEVEL.teams) {
 const raycaster = new THREE.Raycaster();
 const v0 = new THREE.Vector3();
 const fireCannon = (ship, scene) => {
+  SOUNDFX.fireShip(ship);
 
   // Do a forward trace.
   const origin = new THREE.Vector3().copy(ship.position);
@@ -74,16 +74,19 @@ const fireCannon = (ship, scene) => {
   const dist = v0.copy(origin).distanceTo(end);
   PROJECTILES.add(photon, PHOTON_LENGTH, origin, end, dist/PHOTON_SPEED,
       () => {
-        if (hitShip) {
+        if (hitShip && !hitShip.dead) {
           hitShip.health -= 13.5/2;
           if (hitShip.health <= 0) {
-            VFX.explode(hitShip.position, 50, 4, 0xFFFFFF, 0xFFFFFF);
+            hitShip.dead = true;
+            SOUNDFX.explShip(hitShip);
+            VFX.explode(end, 1000, 5, 0xFFFFFF, 0xFFFFFF);
             LEVEL.removeShip(hitShip);
             MAIN.scene.remove(hitShip);
+            console.log('Killed: ', hitShip);
           } else {
-            VFX.explode(hitShip.position, 15, 0.25, 0xAAAAFF, 0xFFFFFF);
+            SOUNDFX.hitShip(hitShip);
+            VFX.explode(end, 25, 0.5, 0xAAAAFF, 0xFFFFFF);
           }
-          console.log("HIT! Remaining health: ", hitShip.health);
         }
       }
   );

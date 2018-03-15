@@ -32,6 +32,7 @@ const keyToInputMap = {
   w: 'pitchDown',
   q: 'yawLeft',
   e: 'yawRight',
+  c: 'fire',
 };
 // construct reverse map
 PHYSICS.inputMap = {};

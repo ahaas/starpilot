@@ -7,6 +7,7 @@ explosions = [];
 VFX.explode = (pos, size, duration, colorStart, colorEnd) => {
   const geo = new THREE.SphereGeometry(1, 32, 16);
   const mat = new THREE.MeshBasicMaterial({ color: colorStart });
+  //mat.side = THREE.DoubleSide;
   mat.transparent = true;
   const explosion = new THREE.Mesh(geo, mat);
 

@@ -28,7 +28,7 @@ SPACECRAFT_TRAILS.update = (scene, delta) => {
       sc.posHistory = [];
       sc.posHistoryCursor = 0;
       for (let x = 0; x < TRAIL_LENGTH; x++) {
-        sc.posHistory[x] = new THREE.Vector3();
+        sc.posHistory[x] = sc.position.clone();
       }
     }
 
