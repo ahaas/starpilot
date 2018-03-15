@@ -2,7 +2,7 @@ SPACECRAFT_TRAILS = {}
 
 {
 
-const TRAIL_LENGTH = 1000;
+const TRAIL_LENGTH = 200;
 
 
 function getPosHistory(sc, ago) {
@@ -17,7 +17,7 @@ let lastUpdate = 0;
 SPACECRAFT_TRAILS.update = (scene, delta) => {
   time += delta;
 
-  if (time < lastUpdate + 0.001) {
+  if (time < lastUpdate + 0.05) {
     return;
   }
   lastUpdate = time;
@@ -37,22 +37,28 @@ SPACECRAFT_TRAILS.update = (scene, delta) => {
     const pos = sc.posHistory[sc.posHistoryCursor]
 
     sc.worldFront(pos);
-    pos.multiplyScalar(-20).add(sc.position);
+    pos.multiplyScalar(-15).add(sc.position);
 
     const material = new THREE.LineBasicMaterial({
       color: LEVEL.teamConfigs[sc.team].trailColor || 0xFFFFFF,
       linewidth: 5,
     });
-    const geometry = new THREE.Geometry();
-    for (let i = 0; i < TRAIL_LENGTH; i++) {
-      geometry.vertices.push(getPosHistory(sc, i));
+    let geometry = sc.line && sc.line.geometry;
+    if (!geometry) {
+      geometry = new THREE.Geometry();
+      const line = new THREE.Line(geometry, material);
+      for (let i = 0; i < TRAIL_LENGTH; i++) {
+        geometry.vertices.push(getPosHistory(sc, i));
+      }
+      line.frustumCulled = false;
+      scene.add(line);
+      sc.line = line;
+    } else {
+      for (let i = 0; i < TRAIL_LENGTH; i++) {
+        geometry.vertices[i] = getPosHistory(sc, i);
+      }
+      geometry.verticesNeedUpdate = true;
     }
-    const line = new THREE.Line(geometry, material);
-    scene.remove(sc.line);
-    scene.add(line);
-    sc.line = line;
-
-
   });
 
 }
