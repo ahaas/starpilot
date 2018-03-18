@@ -31,6 +31,10 @@ HUD.reset = () => {
 };
 
 HUD.updateShipCounts = () => {
+  if (!LEVEL.localSpaceCraft) {
+    HUD.reset();
+    return;
+  }
   let enemies = 0;
   let friendlies = 0;
   LEVEL.spaceCrafts.forEach((ship) => {
@@ -45,11 +49,22 @@ HUD.updateShipCounts = () => {
 };
 
 HUD.updateHealth = () => {
+  if (!LEVEL.localSpaceCraft) {
+    HUD.reset();
+    return;
+  }
   HUD.health.innerHTML = LEVEL.localSpaceCraft.kills + ' KILLS<br>' + Math.max(0, LEVEL.localSpaceCraft.health) + ' HEALTH'
 };
 
 const v0 = new THREE.Vector3();
 HUD.updateCrosshair = () => {
+  const ctx = HUD.crosshair.getContext('2d');
+  ctx.clearRect(0, 0, HUD.crosshair.width, HUD.crosshair.height);
+
+  if (!LEVEL.localSpaceCraft) {
+    return;
+  }
+
   v0.copy(LEVEL.localSpaceCraft.worldFront()).multiplyScalar(500)
     .add(LEVEL.localSpaceCraft.position);
   const windowWidth = Math.max(window.innerWidth, 100)
@@ -59,9 +74,7 @@ HUD.updateCrosshair = () => {
   const x = v0.x * widthHalf + widthHalf;
   const y = -v0.y * heightHalf + heightHalf;
 
-  const ctx = HUD.crosshair.getContext('2d');
   ctx.strokeStyle = 'white';
-  ctx.clearRect(0, 0, HUD.crosshair.width, HUD.crosshair.height);
   ctx.strokeRect(x-5, y-5, 10, 10);
   //ctx.fillStyle = 'green';
   //ctx.fillRect(x-5, y-5, 10, 10);

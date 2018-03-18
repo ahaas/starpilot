@@ -72,7 +72,7 @@ const simulate = (sc) => {
   // Act based on state.
   resetInputs(sc);
 
-  const STEER_AGGRO = 1.5;
+  const STEER_AGGRO = 1;  // LOWER IS MORE AGGRESSIVE.
   if (sc.ai.state == states.attack) {
     //console.log(dir.y, forwardSpeed);
     sc.inputs.thrust = lookingTowards && dir.y - forwardSpeed * 5 > 0;

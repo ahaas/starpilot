@@ -21,12 +21,22 @@ LEVEL.teamConfigs[LEVEL.teams.enemy] = {
 };
 
 LEVEL.clear = (scene) => {
-  scene.remove(...LEVEL.spaceCrafts);
+  scene = MAIN.scene;
+  LEVEL.spaceCrafts.forEach((ship) => {
+    scene.remove(ship);
+    if (ship.line) {
+      scene.remove(ship.line);
+    }
+  });
+  if (LEVEL.staticObjs) {
+    scene.remove(...LEVEL.staticObjs);
+  }
   LEVEL.localSpaceCraft = null;
   LEVEL.spaceCrafts = [];
 }
 
 LEVEL.loadLevelNum = (num, scene) => {
+  scene = MAIN.scene;
   HUD.reset();
   LEVEL.clear(scene);
   levelSetupFuncs[num](scene);
@@ -35,9 +45,11 @@ LEVEL.loadLevelNum = (num, scene) => {
     HUD.updateHealth();
   }
   // TODO: FIX THIS
-  window.setTimeout(() => {
-    SOUNDFX.initLevel();
-  }, 3000);
+  /*window.setTimeout(() => {
+  }, 3000);*/
+  SOUNDFX.initLevel();
+
+  MENU.hide();
 }
 
 LEVEL.removeShip = (ship) => {
@@ -46,6 +58,17 @@ LEVEL.removeShip = (ship) => {
   MAIN.scene.remove(ship.line);
   MAIN.scene.remove(ship);
   HUD.updateShipCounts();
+
+  let enemies = 0;
+  LEVEL.spaceCrafts.forEach((ship) => {
+    if (ship.team == LEVEL.teams.enemy) {
+      enemies++;
+    }
+  });
+  if (enemies == 0) {
+    LEVEL.clear();
+    MENU.victory();
+  }
 }
 
 const createLocalSpaceCraft = (scName, scene) => {
@@ -70,11 +93,14 @@ const createSpaceCraft = (scName, scene, team) => {
 const levelSetupFuncs = [
   // Level 0: Menu.
   (scene) => {
+    LEVEL.staticObjs = ASTEROIDS.populate(scene, 1000);
+    createLocalSpaceCraft('dstar', scene);
   },
   // Level 1: Easy small battle.
   (scene) => {
     LEVEL.staticObjs = ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
+    LEVEL.localSpaceCraft.position.y = -220;
 
     let enemy
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.enemy);
@@ -87,20 +113,20 @@ const levelSetupFuncs = [
     enemy.position.x = -50;
 
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
-    enemy.position.y = -500;
+    enemy.position.y = -200;
     enemy.position.x = 0;
     enemy.position.z = 100;
 
     enemy = createSpaceCraft('dstar', scene, LEVEL.teams.local);
-    enemy.position.y = -500;
-    enemy.position.x = -400;
+    enemy.position.y = -200;
+    enemy.position.x = -200;
     enemy.position.z = 150;
   },
   // Level 2: Large battle.
   (scene) => {
     LEVEL.staticObjs = ASTEROIDS.populate(scene, 1001);
     createLocalSpaceCraft('dstar', scene);
-    LEVEL.localSpaceCraft.position.y = -1000;
+    LEVEL.localSpaceCraft.position.y = -1300;
 
     let enemy;
     const interval = 100;

@@ -56,7 +56,7 @@
     }
     .title {
       font-family: helvetica, sans-serif;
-      font-size: 50px;
+      font-size: 55px;
       color: white;
       font-style: bold;
       padding-bottom: 20px;
@@ -68,21 +68,41 @@
       margin: 12px;
       font-size: 20px;
       border: 0;
+      width: 200px;
     }
     .menu button:hover {
       background-color: #222266;
       padding: 12px 25px;
       border: 0;
     }
+    #tutorial {
+      text-align: center;
+      color: white;
+      font-family: helvetica, sans-serif;
+      font-size: 30px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 20%;
+      display: none;
+      align-items: center;
+      z-index: 500;
+    }
   </style>
 </head>
 
 <body>
-  <div class="menu">
-    <div class="title">StarPilot</div>
+  <div class="menu" id="menu">
+    <div class="title" id="title">StarPilot</div>
     <button id="stage0">Stage 0: Tutorial</button>
     <button id="stage1">Stage 1: Skirmish</button>
     <button id="stage2">Stage 2: Battle</button>
+  </div>
+  <div id="tutorial">
+    WASD(QE): Rotate<br>
+    Shift/Space: Thrust<br>
+    Click+drag: Camera<br>
+    Escape: Menu
   </div>
   <script src="js/lib/Three.js"></script>
   <script src="js/lib/OrbitControls.js"></script>
@@ -104,6 +124,8 @@
   <script src="js/soundfx.js"></script>
   <script src="js/hud.js"></script>
   <script src="js/main.js"></script>
+
+  <script src="js/menu.js"></script>
 </body>
 
 </html>

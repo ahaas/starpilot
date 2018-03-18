@@ -29,6 +29,7 @@ HUD.init();
 //
 
 let prevTime = performance.now();  // Can be replaced with THREE.Clock
+let escPressed = false;
 function render() {
   requestAnimationFrame(render);
 
@@ -41,13 +42,17 @@ function render() {
   SPACECRAFT_TRAILS.update(scene, delta);
   SPACECRAFT_AI.update(delta, scene);
   PROJECTILES.update();
+  VFX.update();
+  camera.getWorldPosition(skybox.position);
+  HUD.updateCrosshair();
 
   if (LEVEL.localSpaceCraft) {
     WEAPONS.update(delta, scene);
     LEVEL.localSpaceCraft.add(camera);
-    VFX.update();
-    camera.getWorldPosition(skybox.position);
-    HUD.updateCrosshair();
+  }
+  if (!!CONTROLS.keysPressed['escape'] != escPressed) {
+    escPressed = !escPressed;
+    if (escPressed) MENU.toggle();
   }
 
   renderer.render(scene, camera);
@@ -90,7 +95,7 @@ scene.add(hemiLight);
 THREE.DefaultLoadingManager.onLoad = () => {
   scene.add(skybox);
   CONTROLS.setMode(CONTROLS.modes.ORBIT, camera, renderer);
-  LEVEL.loadLevelNum(0, scene);
+  MENU.show();
 };
 
 THREE.DefaultLoadingManager.onProgress = (url, numLoaded, numTotal) => {
