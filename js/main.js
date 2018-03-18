@@ -10,19 +10,21 @@ const camera = new THREE.PerspectiveCamera(80, 1, 0.1, 1000 * 1000 * 2);
 const scene = new THREE.Scene();
 const stats = new Stats();
 MAIN.listener = new THREE.AudioListener();
+MAIN.camera = camera;
 camera.add(MAIN.listener);
 
 MAIN.scene = scene;
 
 const skybox = SKYBOX.construct();
 
-camera.position.set(0, -50, 18);
+camera.position.set(0, -50, 12);
 camera.up.set(0, 0, 1);  // Set +z as up.
 
 renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1)
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(stats.dom);
+HUD.init();
 
 //
 
@@ -45,6 +47,7 @@ function render() {
     LEVEL.localSpaceCraft.add(camera);
     VFX.update();
     camera.getWorldPosition(skybox.position);
+    HUD.updateCrosshair();
   }
 
   renderer.render(scene, camera);
@@ -56,6 +59,10 @@ const onResize = () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
+  if (HUD.crosshair) {
+    HUD.crosshair.width = window.innerWidth;
+    HUD.crosshair.height = window.innerHeight;
+  }
 };
 window.addEventListener('resize', onResize, false);
 onResize();

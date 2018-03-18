@@ -75,18 +75,24 @@ const fireCannon = (ship, scene) => {
   PROJECTILES.add(photon, PHOTON_LENGTH, origin, end, dist/PHOTON_SPEED,
       () => {
         if (hitShip && !hitShip.dead) {
-          hitShip.health -= 13.5/2;
+          hitShip.health -= 7;
           if (hitShip.health <= 0) {
             hitShip.dead = true;
             SOUNDFX.explShip(hitShip);
-            VFX.explode(end, 1000, 5, 0xFFFFFF, 0xFFFFFF);
+            VFX.explode(hitShip.position, 1000, 5, 0xFFFFFF, 0xFFFFFF);
             LEVEL.removeShip(hitShip);
             MAIN.scene.remove(hitShip);
             console.log('Killed: ', hitShip);
+            ship.kills = (ship.kills || 0) + 1;
+            HUD.updateHealth();
           } else {
             SOUNDFX.hitShip(hitShip);
-            VFX.explode(end, 25, 0.5, 0xAAAAFF, 0xFFFFFF);
+            VFX.explode(hitShip.position, 25, 0.5, 0xAAAAFF, 0xFFFFFF);
           }
+        }
+
+        if (hitShip == LEVEL.localSpaceCraft) {
+          HUD.updateHealth();
         }
       }
   );

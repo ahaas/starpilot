@@ -16,7 +16,7 @@ let orbitControls;
 CONTROLS.setMode = (mode, camera, renderer) => {
   if (mode == CONTROLS.modes.ORBIT) {
     if (!orbitControls) {
-      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls = new THREE.OrbitControls(camera, document);
     }
     orbitControls.enabled = true;
   }
